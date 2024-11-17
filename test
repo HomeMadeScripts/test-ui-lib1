@@ -1,0 +1,167 @@
+local UILibrary = {}
+
+function UILibrary.new(title)
+    local library = {}
+    library.tabs = {}
+    
+    -- Create main UI frame
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "CustomUILibrary"
+    ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 400, 0, 300)
+    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Parent = ScreenGui
+
+    local UIListLayout = Instance.new("UIListLayout")
+    UIListLayout.FillDirection = Enum.FillDirection.Vertical
+    UIListLayout.Padding = UDim.new(0, 10)
+    UIListLayout.Parent = MainFrame
+    
+    local TitleBar = Instance.new("TextLabel")
+    TitleBar.Size = UDim2.new(1, 0, 0, 30)
+    TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    TitleBar.Text = title or "UI Library"
+    TitleBar.Font = Enum.Font.SourceSans
+    TitleBar.TextSize = 18
+    TitleBar.TextColor3 = Color3.new(1, 1, 1)
+    TitleBar.Parent = MainFrame
+
+    local ExitButton = Instance.new("TextButton")
+    ExitButton.Size = UDim2.new(0, 30, 0, 30)
+    ExitButton.Position = UDim2.new(1, -35, 0, 0)
+    ExitButton.AnchorPoint = Vector2.new(1, 0)
+    ExitButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    ExitButton.Text = "X"
+    ExitButton.Font = Enum.Font.SourceSansBold
+    ExitButton.TextSize = 18
+    ExitButton.TextColor3 = Color3.new(1, 1, 1)
+    ExitButton.Parent = TitleBar
+    
+    ExitButton.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+    
+    -- Tab Creation Functionality
+    function library:CreateTab(tabName)
+        local Tab = {}
+        
+        local TabButton = Instance.new("TextButton")
+        TabButton.Size = UDim2.new(0, 100, 0, 30)
+        TabButton.Text = tabName
+        TabButton.Font = Enum.Font.SourceSans
+        TabButton.TextSize = 16
+        TabButton.TextColor3 = Color3.new(1, 1, 1)
+        TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        TabButton.Parent = MainFrame
+        
+        local TabFrame = Instance.new("Frame")
+        TabFrame.Size = UDim2.new(1, 0, 1, -40)
+        TabFrame.Position = UDim2.new(0, 0, 0, 40)
+        TabFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        TabFrame.Visible = false
+        TabFrame.Parent = MainFrame
+
+        local TabLayout = Instance.new("UIListLayout")
+        TabLayout.Padding = UDim.new(0, 10)
+        TabLayout.Parent = TabFrame
+
+        TabButton.MouseButton1Click:Connect(function()
+            for _, child in pairs(MainFrame:GetChildren()) do
+                if child:IsA("Frame") and child ~= TabFrame then
+                    child.Visible = false
+                end
+            end
+            TabFrame.Visible = true
+        end)
+        
+        function Tab:Button(buttonName, callback)
+            local Button = Instance.new("TextButton")
+            Button.Size = UDim2.new(1, 0, 0, 30)
+            Button.Text = buttonName
+            Button.Font = Enum.Font.SourceSans
+            Button.TextSize = 16
+            Button.TextColor3 = Color3.new(1, 1, 1)
+            Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            Button.Parent = TabFrame
+            
+            Button.MouseButton1Click:Connect(callback)
+        end
+        
+        function Tab:Toggle(toggleName, callback)
+            local Toggle = Instance.new("Frame")
+            Toggle.Size = UDim2.new(1, 0, 0, 30)
+            Toggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            Toggle.Parent = TabFrame
+            
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(0.8, 0, 1, 0)
+            Label.Text = toggleName
+            Label.Font = Enum.Font.SourceSans
+            Label.TextSize = 16
+            Label.TextColor3 = Color3.new(1, 1, 1)
+            Label.BackgroundTransparency = 1
+            Label.Parent = Toggle
+            
+            local ToggleButton = Instance.new("TextButton")
+            ToggleButton.Size = UDim2.new(0.2, 0, 1, 0)
+            ToggleButton.Position = UDim2.new(0.8, 0, 0, 0)
+            ToggleButton.Text = "OFF"
+            ToggleButton.Font = Enum.Font.SourceSans
+            ToggleButton.TextSize = 16
+            ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+            ToggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+            ToggleButton.Parent = Toggle
+            
+            local isOn = false
+            ToggleButton.MouseButton1Click:Connect(function()
+                isOn = not isOn
+                ToggleButton.Text = isOn and "ON" or "OFF"
+                callback(isOn)
+            end)
+        end
+        
+        function Tab:Textbox(textboxName, placeholder, callback)
+            local Textbox = Instance.new("Frame")
+            Textbox.Size = UDim2.new(1, 0, 0, 30)
+            Textbox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            Textbox.Parent = TabFrame
+            
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(0.4, 0, 1, 0)
+            Label.Text = textboxName
+            Label.Font = Enum.Font.SourceSans
+            Label.TextSize = 16
+            Label.TextColor3 = Color3.new(1, 1, 1)
+            Label.BackgroundTransparency = 1
+            Label.Parent = Textbox
+            
+            local Input = Instance.new("TextBox")
+            Input.Size = UDim2.new(0.6, 0, 1, 0)
+            Input.Position = UDim2.new(0.4, 0, 0, 0)
+            Input.PlaceholderText = placeholder
+            Input.Font = Enum.Font.SourceSans
+            Input.TextSize = 16
+            Input.TextColor3 = Color3.new(1, 1, 1)
+            Input.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Input.Parent = Textbox
+            
+            Input.FocusLost:Connect(function(enterPressed)
+                if enterPressed then
+                    callback(Input.Text)
+                end
+            end)
+        end
+        
+        library.tabs[tabName] = Tab
+        return Tab
+    end
+    
+    return library
+end
+
+return UILibrary
